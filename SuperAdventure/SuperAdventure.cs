@@ -29,10 +29,57 @@ namespace SuperAdventure
             _player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RAT_TAIL), 5));
 
             // Assign labels text values to match player's attributes
+            RefreshAttributesLabels();
+            RefreshInventoryView();
+            RefreshQuestView();
+        }
+
+        private void RefreshAttributesLabels()
+        {
             lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             lblGold.Text = _player.Gold.ToString();
             lblExperience.Text = _player.ExperiencePoints.ToString();
             lblLevel.Text = _player.Level.ToString();
+        }
+
+        private void RefreshInventoryView()
+        {
+            dgvInventory.RowHeadersVisible = false;
+
+            dgvInventory.ColumnCount = 2;
+            dgvInventory.Columns[0].Name = "Name";
+            dgvInventory.Columns[0].Width = 197;
+            dgvInventory.Columns[1].Name = "Quantity";
+
+            dgvInventory.Rows.Clear();
+
+            if (_player.Inventory.Count != 0) 
+            { 
+                foreach (InventoryItem item in _player.Inventory)
+                {
+                    dgvInventory.Rows.Add(new[] { item.Details.Name, item.Quantity.ToString() });
+                }
+            }
+        }
+        
+        private void RefreshQuestView()
+        {
+            dgvQuests.RowHeadersVisible = false;
+
+            dgvQuests.ColumnCount = 2;
+            dgvQuests.Columns[0].Name = "Quest";
+            dgvQuests.Columns[0].Width = 197;
+            dgvQuests.Columns[1].Name = "Done?";
+
+            dgvQuests.Rows.Clear();
+
+            if (_player.Quests.Count != 0)
+            {
+                foreach (PlayerQuest quest in _player.Quests)
+                {
+                    dgvQuests.Rows.Add(new[] { quest.Details.Name, quest.IsComplete?"Yes":"No" });
+                }
+            }
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
@@ -58,36 +105,46 @@ namespace SuperAdventure
         private void MoveTo(Location newLocation)
         {
             if (newLocation.ItemRequiredToEnter != null)
-            {
-                bool hasKey = false;
-
-                foreach (InventoryItem item in _player.Inventory)
-                {
-                    if (item.Details.Name == newLocation.ItemRequiredToEnter.Name)
-                    {
-                        hasKey = true;
-                        break;
-                    }
-                }
-
-                if (!hasKey)
-                {
-                    rtbMessages.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name +
-                        " to enter this location." + Environment.NewLine;
-                    return;
-                }
+            {                
+                if (!LookForItemRequiredToEnter(newLocation)) { return; }
             }
-
+         
             UpdateLocation(newLocation);
 
             RestoreHitPoints();
 
-            ProcessQuest(newLocation.QuestAvailableHere);
+            if (newLocation.QuestAvailableHere != null)
+            {
+                ProcessQuest(newLocation.QuestAvailableHere);
+            }
 
             if (newLocation.MonsterLivingHere != null)
             {
 
             }
+        }
+
+        private bool LookForItemRequiredToEnter(Location newLocation)
+        {
+            bool hasKey = false;
+
+            foreach (InventoryItem item in _player.Inventory)
+            {
+                if (item.Details.ID == newLocation.ItemRequiredToEnter.ID)
+                {
+                    hasKey = true;
+                    break;
+                }
+            }
+
+            if (!hasKey)
+            {
+                rtbMessages.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name +
+                    " to enter this location." + Environment.NewLine;
+                rtbMessages.Text += Environment.NewLine;
+            }
+
+            return hasKey;
         }
 
         private void UpdateLocation(Location newLocation)
@@ -117,72 +174,72 @@ namespace SuperAdventure
 
         private void ProcessQuest(Quest quest)
         {
-            if (quest != null)
+            // add quest if player doesn't have it yet
+            if (!_player.Quests.Exists(a => a.Details.ID == quest.ID))
             {
-                if (!_player.Quests.Exists(a => a.Details.ID == quest.ID))
-                {
-                    _player.Quests.Add(new PlayerQuest(quest));
+                _player.Quests.Add(new PlayerQuest(quest));
 
-                    rtbMessages.Text += "You received the " + quest.Name + " quest." + Environment.NewLine;
-                    rtbMessages.Text += "To complete it, return with:" + Environment.NewLine;
-                    
-                    foreach (QuestCompletionItem item in quest.QuestCompletionItems)
+                rtbMessages.Text += "You received the " + quest.Name + " quest." + Environment.NewLine;
+                rtbMessages.Text += "To complete it, return with:" + Environment.NewLine;
+
+                foreach (QuestCompletionItem item in quest.QuestCompletionItems)
+                {
+                    if (item.Quantity == 1)
                     {
-                        if (item.Quantity == 1)
-                        {
-                            rtbMessages.Text += item.Quantity.ToString() + " " + item.Details.Name + Environment.NewLine;
-                        }
-                        else
-                        {
-                            rtbMessages.Text += item.Quantity.ToString() + " " + item.Details.NamePlural + Environment.NewLine;
-                        }
+                        rtbMessages.Text += item.Quantity.ToString() + " " + item.Details.Name + Environment.NewLine;
                     }
-                    rtbMessages.Text += Environment.NewLine;
-                }
-                else
-                {
-                    int index = _player.Quests.FindIndex(a => a.Details.Name == quest.Name);
-
-                    if (!_player.Quests[index].IsComplete)
+                    else
                     {
-                        bool hasItems = true;
-                        bool foundItem = false;
+                        rtbMessages.Text += item.Quantity.ToString() + " " + item.Details.NamePlural + Environment.NewLine;
+                    }
+                }
+                rtbMessages.Text += Environment.NewLine;
+            }
+            // otherwise check if player meets quest's completion requirements
+            else
+            {
+                int index = _player.Quests.FindIndex(a => a.Details.ID == quest.ID);
 
-                        foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
+                if (!_player.Quests[index].IsComplete)
+                {
+                    bool hasItems = true;
+                    bool foundItem = false;
+
+                    foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
+                    {
+                        foundItem = false;
+
+                        foreach (InventoryItem playerItem in _player.Inventory)
                         {
-                            foundItem = false;
-
-                            foreach (InventoryItem playerItem in _player.Inventory)
+                            if (playerItem.Details.ID == questItem.Details.ID && playerItem.Quantity >= questItem.Quantity)
                             {
-                                if (playerItem.Details.Name == questItem.Details.Name && playerItem.Quantity >= questItem.Quantity)
-                                {
-                                    foundItem = true;
-                                }
+                                foundItem = true;
                             }
-
-                            hasItems = hasItems & foundItem;
                         }
 
-                        if (hasItems)
-                        {
-                            _player.Quests[index].IsComplete = true;
-                            CompleteQuest(quest);                           
-                        }
+                        hasItems = hasItems & foundItem;
+                    }
+
+                    if (hasItems)
+                    {
+                        _player.Quests[index].IsComplete = true;
+                        CompleteQuest(quest);
                     }
                 }
             }
+            RefreshQuestView();
         }
 
         private void CompleteQuest(Quest quest)
         {
-            rtbMessages.Text += Environment.NewLine;
             rtbMessages.Text += "You completed the " + quest.Name + " quest." + Environment.NewLine;
 
+            // remove quest completion items from player's inventory
             foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
             {
                 foreach (InventoryItem playerItem in _player.Inventory)
                 {
-                    if (playerItem.Details.Name == questItem.Details.Name)
+                    if (playerItem.Details.ID == questItem.Details.ID)
                     {
                         playerItem.Quantity -= questItem.Quantity;
                     }
@@ -192,9 +249,10 @@ namespace SuperAdventure
             rtbMessages.Text += "You receive: " + Environment.NewLine;
             rtbMessages.Text += quest.RewardExperiencePoints + " experience points" + Environment.NewLine;
             rtbMessages.Text += quest.RewardGold + " gold" + Environment.NewLine;
-            rtbMessages.Text += quest.RewardItem.Name + Environment.NewLine;
+            rtbMessages.Text += "1 " + quest.RewardItem.Name + Environment.NewLine;
             rtbMessages.Text += Environment.NewLine;
 
+            // add quest's rewards
             _player.ExperiencePoints += quest.RewardExperiencePoints;
             _player.Gold += quest.RewardGold;
 
@@ -207,6 +265,10 @@ namespace SuperAdventure
             {
                 _player.Inventory.Add(new InventoryItem(quest.RewardItem, 1));
             }
+
+            RefreshAttributesLabels();
+            RefreshInventoryView();
+            RefreshQuestView();
         }
     }
 }
