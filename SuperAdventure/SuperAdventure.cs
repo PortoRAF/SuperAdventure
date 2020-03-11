@@ -32,6 +32,7 @@ namespace SuperAdventure
             RefreshAttributesLabels();
             RefreshInventoryView();
             RefreshQuestView();
+            SetComboBoxVisibility(false);
         }
 
         private void RefreshAttributesLabels()
@@ -120,7 +121,15 @@ namespace SuperAdventure
 
             if (newLocation.MonsterLivingHere != null)
             {
+                _currentMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
 
+                rtbMessages.Text += "You see a " + _currentMonster.Name + Environment.NewLine;
+
+                SetComboBoxVisibility(true);
+            }
+            else 
+            {
+                SetComboBoxVisibility(false);
             }
         }
 
@@ -269,6 +278,61 @@ namespace SuperAdventure
             RefreshAttributesLabels();
             RefreshInventoryView();
             RefreshQuestView();
+        }
+
+        private void SetComboBoxVisibility(bool isVisible)
+        {
+            lblSelectAction.Visible = isVisible;
+
+            cboWeapons.Visible = isVisible;
+            btnUseWeapon.Visible = isVisible;
+
+            cboPotions.Visible = isVisible;
+            btnUsePotion.Visible = isVisible;
+
+            if (isVisible)
+            {
+                List<Weapon> weapons = new List<Weapon>();
+                List<Item> healingPotions = new List<Item>();
+
+                foreach (InventoryItem item in _player.Inventory)
+                {
+                    if (item.Details is Weapon && item.Quantity > 0)
+                    {
+                        weapons.Add((Weapon)item.Details);
+                    }
+                    if (item.Details.ID == World.ITEM_ID_HEALING_POTION && item.Quantity > 0)
+                    {
+                        healingPotions.Add(item.Details);
+                    }
+                }
+
+                if (weapons.Count != 0)
+                {
+                    cboWeapons.DataSource = weapons;
+                    cboWeapons.DisplayMember = "Name";
+                    cboWeapons.ValueMember = "ID";
+                    cboWeapons.SelectedIndex = 0;
+                }
+                else
+                {
+                    cboWeapons.Visible = false;
+                    btnUseWeapon.Visible = false;
+                }
+                
+                if (healingPotions.Count != 0)
+                {
+                    cboPotions.DataSource = healingPotions;
+                    cboPotions.DisplayMember = "Name";
+                    cboPotions.ValueMember = "ID";
+                    cboPotions.SelectedIndex = 0;
+                }
+                else
+                {
+                    cboPotions.Visible = false;
+                    btnUsePotion.Visible = false;
+                }
+            }
         }
     }
 }
