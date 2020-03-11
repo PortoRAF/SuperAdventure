@@ -124,11 +124,11 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(617, 531);
+			this.label5.Location = new System.Drawing.Point(621, 531);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(69, 13);
+			this.label5.Size = new System.Drawing.Size(72, 13);
 			this.label5.TabIndex = 8;
-			this.label5.Text = "Select action";
+			this.label5.Text = "Select action:";
 			// 
 			// cboWeapons
 			// 
@@ -172,6 +172,7 @@
 			this.btnNorth.TabIndex = 13;
 			this.btnNorth.Text = "North";
 			this.btnNorth.UseVisualStyleBackColor = true;
+			this.btnNorth.Click += new System.EventHandler(this.btnNorth_Click);
 			// 
 			// btnEast
 			// 
@@ -181,6 +182,7 @@
 			this.btnEast.TabIndex = 14;
 			this.btnEast.Text = "East";
 			this.btnEast.UseVisualStyleBackColor = true;
+			this.btnEast.Click += new System.EventHandler(this.btnEast_Click);
 			// 
 			// btnSouth
 			// 
@@ -190,6 +192,7 @@
 			this.btnSouth.TabIndex = 15;
 			this.btnSouth.Text = "South";
 			this.btnSouth.UseVisualStyleBackColor = true;
+			this.btnSouth.Click += new System.EventHandler(this.btnSouth_Click);
 			// 
 			// btnWest
 			// 
@@ -199,6 +202,7 @@
 			this.btnWest.TabIndex = 16;
 			this.btnWest.Text = "West";
 			this.btnWest.UseVisualStyleBackColor = true;
+			this.btnWest.Click += new System.EventHandler(this.btnWest_Click);
 			// 
 			// rtbLocation
 			// 

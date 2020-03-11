@@ -24,11 +24,31 @@ namespace SuperAdventure
 
 			_player = new Player(10, 10, 20, 0, 1);
 			
-			// Assign labels text values to match player's
+			// Assign labels text values to match player's attributes
 			lblHitPoints.Text	= _player.CurrentHitPoints.ToString();
 			lblGold.Text		= _player.Gold.ToString();
 			lblExperience.Text	= _player.ExperiencePoints.ToString();
 			lblLevel.Text		= _player.Level.ToString();
+		}
+
+		private void btnNorth_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void btnEast_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void btnSouth_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void btnWest_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }
