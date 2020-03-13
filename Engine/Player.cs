@@ -25,5 +25,79 @@ namespace Engine
 			Inventory = new List<InventoryItem>();
 			Quests = new List<PlayerQuest>();
 		}
+
+		public bool HasRequiredItemToEnterThisLocation(Location location)
+		{
+			if (location.ItemRequiredToEnter == null)
+			{
+				// there is no required item to enter this location, so return true
+				return true;
+			}
+
+			return Inventory.Exists(a => a.Details.ID == location.ItemRequiredToEnter.ID);
+		}
+
+		public bool HasThisQuest(Quest quest)
+		{
+			return Quests.Exists(a => a.Details.ID == quest.ID);
+		}
+
+		public bool CompletedThisQuest(Quest quest)
+		{
+			return Quests.Find(a => a.Details.ID == quest.ID).IsComplete;
+		}
+
+		public bool HasAllQuestCompletionItems(Quest quest)
+		{
+			bool hasAllQuestItems = true;
+			foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
+			{
+				bool foundItemInInventory = false;
+				foreach (InventoryItem playerItem in Inventory)
+				{
+					if (playerItem.Details.ID == questItem.Details.ID 
+						&& playerItem.Quantity >= questItem.Quantity)
+					{
+						foundItemInInventory = true;
+					}
+				}
+				hasAllQuestItems &= foundItemInInventory;
+			}
+			return hasAllQuestItems;
+		}
+
+		public void RemoveQuestCompletionItems(Quest quest)
+		{
+			foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
+			{
+				foreach (InventoryItem playerItem in Inventory)
+				{
+					if (playerItem.Details.ID == questItem.Details.ID)
+					{
+						playerItem.Quantity -= questItem.Quantity;
+					}
+				}
+			}
+		}
+
+		public void AddQuestRewards(Quest quest) 
+		{
+			ExperiencePoints += quest.RewardExperiencePoints;
+			Gold += quest.RewardGold;
+
+			if (Inventory.Exists(x => x.Details.ID == quest.RewardItem.ID))
+			{
+				Inventory.Find(x => x.Details.ID == quest.RewardItem.ID).Quantity += 1;
+			}
+			else
+			{
+				Inventory.Add(new InventoryItem(quest.RewardItem, 1));
+			}
+		}
+
+		public void MarkQuestCompleted(Quest quest)
+		{
+			Quests.Find(a => a.Details.ID == quest.ID).IsComplete = true;
+		}
 	}
 }
