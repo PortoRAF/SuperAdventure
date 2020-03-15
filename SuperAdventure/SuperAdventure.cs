@@ -379,7 +379,7 @@ namespace SuperAdventure
 
             if (_player.CurrentHitPoints <= 0)
             {
-                rtbMessages.AppendText("You were defeated by " + _currentMonster.Name + "!" + Environment.NewLine);
+                rtbMessages.AppendText("You were defeated by " + _currentMonster.Name + "!" + Environment.NewLine + Environment.NewLine);
                 rtbMessages.AppendText("Villagers found you unconscious and took you to your house." + Environment.NewLine + Environment.NewLine);
 
                 MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
@@ -388,7 +388,15 @@ namespace SuperAdventure
 
         private void btnUsePotion_Click(object sender, EventArgs e)
         {
+            rtbMessages.AppendText("You use 1 healing potion." + Environment.NewLine + Environment.NewLine);
+            HealingPotion potion = (HealingPotion) cboPotions.SelectedItem;
+            _player.CurrentHitPoints += potion.AmountToHeal;
 
+            UpdatePlayerAttributesInUI();
+            UpdateInventoryListInUI();
+            UpdatePotionListInUI();
+
+            DamageToPlayer();
         }
     }
 }
