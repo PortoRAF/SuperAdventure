@@ -107,9 +107,9 @@ namespace SuperAdventure
         {
             if (!_player.HasRequiredItemToEnterThisLocation(newLocation))
             {
-                rtbMessages.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name +
-                    " to enter this location." + Environment.NewLine;
-                rtbMessages.Text += Environment.NewLine;
+                rtbMessages.AppendText("You must have a " + newLocation.ItemRequiredToEnter.Name +
+                    " to enter this location." + Environment.NewLine);
+                rtbMessages.AppendText(Environment.NewLine);
 
                 return;
             }
@@ -127,8 +127,8 @@ namespace SuperAdventure
             {
                 _currentMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
 
-                rtbMessages.Text += "You see a " + _currentMonster.Name + Environment.NewLine;
-                rtbMessages.Text += Environment.NewLine;
+                rtbMessages.AppendText("You see a " + _currentMonster.Name + Environment.NewLine);
+                rtbMessages.AppendText(Environment.NewLine);
 
                 DisplayWeaponAndPotionListsInUI(true);
             }
@@ -151,7 +151,7 @@ namespace SuperAdventure
 
             // Display current location
             rtbLocation.Text = newLocation.Name + Environment.NewLine;
-            rtbLocation.Text += newLocation.Description + Environment.NewLine;
+            rtbLocation.AppendText(newLocation.Description + Environment.NewLine);
         }
 
         private void RestoreHitPoints()
@@ -170,21 +170,21 @@ namespace SuperAdventure
             {
                 _player.Quests.Add(new PlayerQuest(quest));
 
-                rtbMessages.Text += "You received the " + quest.Name + " quest." + Environment.NewLine;
-                rtbMessages.Text += "To complete it, return with:" + Environment.NewLine;
+                rtbMessages.AppendText("You received the " + quest.Name + " quest." + Environment.NewLine);
+                rtbMessages.AppendText("To complete it, return with:" + Environment.NewLine);
 
                 foreach (QuestCompletionItem item in quest.QuestCompletionItems)
                 {
                     if (item.Quantity == 1)
                     {
-                        rtbMessages.Text += item.Quantity.ToString() + " " + item.Details.Name + Environment.NewLine;
+                        rtbMessages.AppendText(item.Quantity.ToString() + " " + item.Details.Name + Environment.NewLine);
                     }
                     else
                     {
-                        rtbMessages.Text += item.Quantity.ToString() + " " + item.Details.NamePlural + Environment.NewLine;
+                        rtbMessages.AppendText(item.Quantity.ToString() + " " + item.Details.NamePlural + Environment.NewLine);
                     }
                 }
-                rtbMessages.Text += Environment.NewLine;
+                rtbMessages.AppendText(Environment.NewLine);
             }
             // otherwise check if player meets quest's completion requirements
             else
@@ -200,12 +200,12 @@ namespace SuperAdventure
 
         private void CompleteQuest(Quest quest)
         {
-            rtbMessages.Text += "You completed the " + quest.Name + " quest." + Environment.NewLine;
-            rtbMessages.Text += "You receive: " + Environment.NewLine;
-            rtbMessages.Text += quest.RewardExperiencePoints + " experience points" + Environment.NewLine;
-            rtbMessages.Text += quest.RewardGold + " gold" + Environment.NewLine;
-            rtbMessages.Text += "1 " + quest.RewardItem.Name + Environment.NewLine;
-            rtbMessages.Text += Environment.NewLine;
+            rtbMessages.AppendText("You completed the " + quest.Name + " quest." + Environment.NewLine);
+            rtbMessages.AppendText("You receive: " + Environment.NewLine);
+            rtbMessages.AppendText(quest.RewardExperiencePoints + " experience points" + Environment.NewLine);
+            rtbMessages.AppendText(quest.RewardGold + " gold" + Environment.NewLine);
+            rtbMessages.AppendText("1 " + quest.RewardItem.Name + Environment.NewLine);
+            rtbMessages.AppendText(Environment.NewLine);
 
             _player.RemoveQuestCompletionItems(quest);
             _player.AddQuestRewards(quest);
@@ -214,6 +214,8 @@ namespace SuperAdventure
             UpdatePlayerAttributesInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
+            UpdateWeaponListInUI();
+            UpdatePotionListInUI();
         }
 
         private void DisplayWeaponAndPotionListsInUI(bool isVisible)
@@ -287,6 +289,106 @@ namespace SuperAdventure
                 btnUsePotion.Visible    = false;
                 return false;
             }
+        }
+
+        private void btnUseWeapon_Click(object sender, EventArgs e)
+        {
+            // get current selected weapon from combo box
+            Weapon currentWeapon = (Weapon)cboWeapons.SelectedItem;
+
+            // calculate damage
+            int damageToMonster = currentWeapon.GetWeaponDamage();
+
+            // subtract inflicted damage to monster's hit points
+            _currentMonster.CurrentHitPoints -= damageToMonster;
+
+            rtbMessages.AppendText("You hit " + _currentMonster.Name + " for " +
+                damageToMonster + " hit points." + Environment.NewLine + Environment.NewLine);
+
+            if (_currentMonster.CurrentHitPoints <= 0)
+            {
+                MonsterDefeated();
+            }
+            else
+            {
+                DamageToPlayer();
+            }
+        }
+
+        private void MonsterDefeated()
+        {
+            List<Item> lootedItems = GetMonsterLoot();
+            _player.AddMonsterRewards(_currentMonster, lootedItems);
+            
+            rtbMessages.AppendText("You killed " + _currentMonster.Name + "!" + Environment.NewLine + Environment.NewLine);
+            rtbMessages.AppendText("You loot: " + Environment.NewLine);
+            rtbMessages.AppendText(_currentMonster.RewardExperiencePoints + " experience points" + Environment.NewLine);
+            rtbMessages.AppendText(_currentMonster.RewardGold + " gold" + Environment.NewLine);
+
+            foreach (Item items in lootedItems)
+            {
+                rtbMessages.AppendText("1 " + items.Name + Environment.NewLine);
+            }
+            rtbMessages.AppendText(Environment.NewLine);
+
+            UpdatePlayerAttributesInUI();
+            UpdateInventoryListInUI();
+            UpdateQuestListInUI();
+            UpdateWeaponListInUI();
+            UpdatePotionListInUI();
+
+            // move player to current location to restore hit points and create a new monster
+            MoveTo(_player.CurrentLocation);
+        }
+
+        private List<Item> GetMonsterLoot()
+        {
+            List<Item> loot = new List<Item>();
+            foreach (LootItem lootItems in _currentMonster.LootTable)
+            {
+                if (RandomNumberGenerator.NumberBetween(1, 100) <= lootItems.DropPercentage)
+                {
+                    loot.Add(lootItems.Details);
+                }
+            }
+
+            // if loot returned empty, add the default loot item
+            if (loot.Count == 0)
+            {
+                foreach (LootItem lootItems in _currentMonster.LootTable)
+                {
+                    if (lootItems.IsDefaultItem)
+                    {
+                        loot.Add(lootItems.Details);
+                    }
+                }
+            }
+
+            return loot;
+        }
+
+        private void DamageToPlayer()
+        {
+            int damageToPlayer = _currentMonster.GetMonsterDamage();
+            _player.CurrentHitPoints -= damageToPlayer;
+
+            rtbMessages.AppendText(_currentMonster.Name + " did " + damageToPlayer.ToString() +
+                " points of damage." + Environment.NewLine + Environment.NewLine);
+
+            UpdatePlayerAttributesInUI();
+
+            if (_player.CurrentHitPoints <= 0)
+            {
+                rtbMessages.AppendText("You were defeated by " + _currentMonster.Name + "!" + Environment.NewLine);
+                rtbMessages.AppendText("Villagers found you unconscious and took you to your house." + Environment.NewLine + Environment.NewLine);
+
+                MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
+            }
+        }
+
+        private void btnUsePotion_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

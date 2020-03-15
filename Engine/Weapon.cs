@@ -18,5 +18,9 @@ namespace Engine
 			MaximumDamage = maximumDamage;
 		}
 
+		public int GetWeaponDamage()
+		{
+			return RandomNumberGenerator.NumberBetween(MinimumDamage, MaximumDamage);
+		}
 	}
 }

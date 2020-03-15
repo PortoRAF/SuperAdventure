@@ -26,6 +26,10 @@ namespace Engine
 
 			LootTable = new List<LootItem>();
 		}
-	}
 
+		public int GetMonsterDamage()
+		{
+			return RandomNumberGenerator.NumberBetween(0, MaximumDamage);
+		}
+	}
 }

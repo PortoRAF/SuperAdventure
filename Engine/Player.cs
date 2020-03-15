@@ -99,5 +99,21 @@ namespace Engine
 		{
 			Quests.Find(a => a.Details.ID == quest.ID).IsComplete = true;
 		}
+
+		public void AddMonsterRewards(Monster monster, List<Item> loot)
+		{
+			ExperiencePoints += monster.RewardExperiencePoints;
+			Gold += monster.RewardGold;
+
+			foreach (Item rewardItems in loot)
+			if (Inventory.Exists(x => x.Details.ID == rewardItems.ID))
+			{
+				Inventory.Find(x => x.Details.ID == rewardItems.ID).Quantity += 1;
+			}
+			else
+			{
+				Inventory.Add(new InventoryItem(rewardItems, 1));
+			}
+		}
 	}
 }
