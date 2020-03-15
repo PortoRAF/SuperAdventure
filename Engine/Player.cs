@@ -68,15 +68,24 @@ namespace Engine
 
 		public void RemoveQuestCompletionItems(Quest quest)
 		{
-			foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
+			List<int> markItemForDeletion = new List<int>();
+			for (int i = 0; i < quest.QuestCompletionItems.Count; i++)
 			{
-				foreach (InventoryItem playerItem in Inventory)
+				for (int j = 0; j < Inventory.Count; j++)				
 				{
-					if (playerItem.Details.ID == questItem.Details.ID)
+					if (Inventory[j].Details.ID == quest.QuestCompletionItems[i].Details.ID)
 					{
-						playerItem.Quantity -= questItem.Quantity;
+						Inventory[j].Quantity -= quest.QuestCompletionItems[i].Quantity;
+						if (Inventory[j].Quantity == 0)
+						{
+							markItemForDeletion.Add(j);
+						}
 					}
 				}
+			}
+			for (int i = markItemForDeletion.Count - 1; i >= 0 ; i--)
+			{
+				Inventory.RemoveAt(markItemForDeletion[i]);
 			}
 		}
 
@@ -113,6 +122,26 @@ namespace Engine
 			else
 			{
 				Inventory.Add(new InventoryItem(rewardItems, 1));
+			}
+		}
+
+		public void RemovePotion(HealingPotion potion)
+		{
+			List<int> markItemForDeletion = new List<int>();
+			for (int i = 0; i < Inventory.Count; i++)
+			{
+				if (Inventory[i].Details.ID == potion.ID)
+				{
+					Inventory[i].Quantity -= 1;
+					if (Inventory[i].Quantity == 0)
+					{
+						markItemForDeletion.Add(i);
+					}
+				}
+			}
+			for (int i = markItemForDeletion.Count - 1; i >= 0; i--)
+			{
+				Inventory.RemoveAt(markItemForDeletion[i]);
 			}
 		}
 	}

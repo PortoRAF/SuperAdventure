@@ -26,8 +26,6 @@ namespace SuperAdventure
             _player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
             MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
 
-            _player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RAT_TAIL), 5));
-
             // Assign labels text values to match player's attributes
             UpdatePlayerAttributesInUI();
             UpdateInventoryListInUI();
@@ -390,7 +388,14 @@ namespace SuperAdventure
         {
             rtbMessages.AppendText("You use 1 healing potion." + Environment.NewLine + Environment.NewLine);
             HealingPotion potion = (HealingPotion) cboPotions.SelectedItem;
+
             _player.CurrentHitPoints += potion.AmountToHeal;
+            if (_player.CurrentHitPoints > _player.MaximumHitPoints)
+            {
+                _player.CurrentHitPoints = _player.MaximumHitPoints;
+            }
+
+            _player.RemovePotion(potion);
 
             UpdatePlayerAttributesInUI();
             UpdateInventoryListInUI();
