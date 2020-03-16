@@ -132,7 +132,17 @@ namespace SuperAdventure
 
             if (newLocation.MonsterLivingHere != null)
             {
-                _currentMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
+                // load monster stats from Monsters list
+                Monster sampleMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
+
+                // create new monster from loaded stats
+                _currentMonster = new Monster(sampleMonster.ID, sampleMonster.Name, sampleMonster.MaximumDamage, 
+                    sampleMonster.RewardExperiencePoints, sampleMonster.RewardGold, sampleMonster.CurrentHitPoints, 
+                    sampleMonster.MaximumHitPoints);
+                foreach (LootItem lootItem in sampleMonster.LootTable)
+                {
+                    _currentMonster.LootTable.Add(lootItem);
+                }
 
                 rtbMessages.AppendText("You see a " + _currentMonster.Name + Environment.NewLine);
                 rtbMessages.AppendText(Environment.NewLine);
