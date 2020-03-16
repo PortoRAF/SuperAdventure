@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Engine
 			}
 		}
 		public int Level { get; set; }
-		public List<InventoryItem> Inventory { get; set; }
+		public BindingList<InventoryItem> Inventory { get; set; }
 		public List<PlayerQuest> Quests { get; set; }
 		public Location CurrentLocation { get; set; }
 		public Weapon CurrentWeapon { get; set; }
@@ -43,7 +44,7 @@ namespace Engine
 			ExperiencePoints = experiencePoints;
 			Level = level;
 
-			Inventory = new List<InventoryItem>();
+			Inventory = new BindingList<InventoryItem>();
 			Quests = new List<PlayerQuest>();
 		}
 
@@ -123,7 +124,7 @@ namespace Engine
 				return true;
 			}
 
-			return Inventory.Exists(a => a.Details.ID == location.ItemRequiredToEnter.ID);
+			return Inventory.Any(a => a.Details.ID == location.ItemRequiredToEnter.ID);
 		}
 
 		public bool HasThisQuest(Quest quest)
@@ -140,7 +141,7 @@ namespace Engine
 		{
 			foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
 			{
-				if (!Inventory.Exists(a => a.Details.ID == questItem.Details.ID 
+				if (!Inventory.Any(a => a.Details.ID == questItem.Details.ID 
 					&& a.Quantity >= questItem.Quantity))
 				{
 					return false;
@@ -174,9 +175,9 @@ namespace Engine
 			AddExperiencePoints(quest.RewardExperiencePoints);
 			Gold += quest.RewardGold;
 
-			if (Inventory.Exists(x => x.Details.ID == quest.RewardItem.ID))
+			if (Inventory.Any(x => x.Details.ID == quest.RewardItem.ID))
 			{
-				Inventory.Find(x => x.Details.ID == quest.RewardItem.ID).Quantity += 1;
+				Inventory.SingleOrDefault(x => x.Details.ID == quest.RewardItem.ID).Quantity += 1;
 			}
 			else
 			{
@@ -195,9 +196,9 @@ namespace Engine
 			Gold += monster.RewardGold;
 
 			foreach (Item rewardItems in loot)
-			if (Inventory.Exists(x => x.Details.ID == rewardItems.ID))
+			if (Inventory.Any(x => x.Details.ID == rewardItems.ID))
 			{
-				Inventory.Find(x => x.Details.ID == rewardItems.ID).Quantity += 1;
+				Inventory.SingleOrDefault(x => x.Details.ID == rewardItems.ID).Quantity += 1;
 			}
 			else
 			{

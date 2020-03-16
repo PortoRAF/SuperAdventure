@@ -38,34 +38,31 @@ namespace SuperAdventure
             lblGold.DataBindings.Add("Text", _player, "Gold");
             lblExperience.DataBindings.Add("Text", _player, "ExperiencePoints");
             lblLevel.DataBindings.Add("Text", _player, "Level");
-            
+
+            dgvInventory.RowHeadersVisible = false;
+            dgvInventory.AutoGenerateColumns = false;
+
+            dgvInventory.DataSource = _player.Inventory;
+
+            dgvInventory.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Name",
+                Width = 197,
+                DataPropertyName = "Description"
+            });
+
+            dgvInventory.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Quantity",
+                DataPropertyName = "Quantity"
+            });
+
             MoveTo(_player.CurrentLocation);
 
-            UpdateInventoryListInUI();
             UpdateQuestListInUI();
             DisplayWeaponAndPotionListsInUI(_player.CurrentLocation.MonsterLivingHere!=null); ;
         }
-
-        private void UpdateInventoryListInUI()
-        {
-            dgvInventory.RowHeadersVisible = false;
-
-            dgvInventory.ColumnCount = 2;
-            dgvInventory.Columns[0].Name = "Name";
-            dgvInventory.Columns[0].Width = 197;
-            dgvInventory.Columns[1].Name = "Quantity";
-
-            dgvInventory.Rows.Clear();
-
-            if (_player.Inventory.Count != 0) 
-            { 
-                foreach (InventoryItem item in _player.Inventory)
-                {
-                    dgvInventory.Rows.Add(new[] { item.Details.Name, item.Quantity.ToString() });
-                }
-            }
-        }
-        
+               
         private void UpdateQuestListInUI()
         {
             dgvQuests.RowHeadersVisible = false;
@@ -215,7 +212,6 @@ namespace SuperAdventure
             _player.AddQuestRewards(quest);
             _player.MarkQuestCompleted(quest);
 
-            UpdateInventoryListInUI();
             UpdateQuestListInUI();
             UpdateWeaponListInUI();
             UpdatePotionListInUI();
@@ -345,7 +341,6 @@ namespace SuperAdventure
             }
             rtbMessages.AppendText(Environment.NewLine);
 
-            UpdateInventoryListInUI();
             UpdateQuestListInUI();
             UpdateWeaponListInUI();
             UpdatePotionListInUI();
@@ -410,7 +405,6 @@ namespace SuperAdventure
 
             _player.RemovePotion(potion);
 
-            UpdateInventoryListInUI();
             UpdatePotionListInUI();
 
             DamageToPlayer();
