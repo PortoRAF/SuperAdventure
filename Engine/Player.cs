@@ -139,7 +139,7 @@ namespace Engine
 
 		public void AddQuestRewards(Quest quest) 
 		{
-			ExperiencePoints += quest.RewardExperiencePoints;
+			AddExperiencePoints(quest.RewardExperiencePoints);
 			Gold += quest.RewardGold;
 
 			if (Inventory.Exists(x => x.Details.ID == quest.RewardItem.ID))
@@ -159,7 +159,7 @@ namespace Engine
 
 		public void AddMonsterRewards(Monster monster, List<Item> loot)
 		{
-			ExperiencePoints += monster.RewardExperiencePoints;
+			AddExperiencePoints(monster.RewardExperiencePoints);
 			Gold += monster.RewardGold;
 
 			foreach (Item rewardItems in loot)
@@ -171,6 +171,13 @@ namespace Engine
 			{
 				Inventory.Add(new InventoryItem(rewardItems, 1));
 			}
+		}
+
+		public void AddExperiencePoints(int experiencePointsToAdd)
+		{
+			ExperiencePoints += experiencePointsToAdd;
+			Level = (ExperiencePoints / 100) + 1;
+			MaximumHitPoints = Level * 10;
 		}
 
 		public void RemovePotion(HealingPotion potion)
