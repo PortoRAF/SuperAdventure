@@ -9,8 +9,27 @@ namespace Engine
 {
 	public class Player : LivingCreature
 	{
-		public int Gold { get; set; }
-		public int ExperiencePoints { get; set; }
+		private int _gold;
+		private int _experiencePoints;
+		public int Gold
+		{
+			get { return _gold; }
+			set
+			{
+				_gold = value;
+				OnPropertyChanged("Gold");
+			}
+		}
+		public int ExperiencePoints
+		{
+			get { return _experiencePoints; }
+			private set
+			{
+				_experiencePoints = value;
+				OnPropertyChanged("ExperiencePoints");
+				OnPropertyChanged("Level");
+			}
+		}
 		public int Level { get; set; }
 		public List<InventoryItem> Inventory { get; set; }
 		public List<PlayerQuest> Quests { get; set; }
@@ -89,6 +108,11 @@ namespace Engine
 				// if there's an error loading xml file, create default player
 				return CreateDefaultPlayer();
 			}
+		}
+
+		public void RestoreHitPoints()
+		{
+			CurrentHitPoints = MaximumHitPoints;
 		}
 
 		public bool HasRequiredItemToEnterThisLocation(Location location)

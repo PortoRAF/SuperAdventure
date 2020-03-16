@@ -33,21 +33,17 @@ namespace SuperAdventure
                 _player = Player.CreateDefaultPlayer();
             }
 
+            // Assign labels text values to match player's attributes
+            lblHitPoints.DataBindings.Add("Text", _player, "CurrentHitPoints");
+            lblGold.DataBindings.Add("Text", _player, "Gold");
+            lblExperience.DataBindings.Add("Text", _player, "ExperiencePoints");
+            lblLevel.DataBindings.Add("Text", _player, "Level");
+            
             MoveTo(_player.CurrentLocation);
 
-            // Assign labels text values to match player's attributes
-            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
             DisplayWeaponAndPotionListsInUI(_player.CurrentLocation.MonsterLivingHere!=null); ;
-        }
-
-        private void UpdatePlayerStatsInUI()
-        {
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-            lblGold.Text = _player.Gold.ToString();
-            lblExperience.Text = _player.ExperiencePoints.ToString();
-            lblLevel.Text = _player.Level.ToString();
         }
 
         private void UpdateInventoryListInUI()
@@ -123,7 +119,7 @@ namespace SuperAdventure
 
             UpdateLocation(newLocation);
 
-            RestoreHitPoints();
+            _player.RestoreHitPoints();
 
             if (newLocation.QuestAvailableHere != null)
             {
@@ -169,15 +165,6 @@ namespace SuperAdventure
             // Display current location
             rtbLocation.Text = newLocation.Name + Environment.NewLine;
             rtbLocation.AppendText(newLocation.Description + Environment.NewLine);
-        }
-
-        private void RestoreHitPoints()
-        {
-            // Restore player's hit points
-            _player.CurrentHitPoints = _player.MaximumHitPoints;
-
-            // Update hit points label
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
         }
 
         private void ProcessQuest(Quest quest)
@@ -228,7 +215,6 @@ namespace SuperAdventure
             _player.AddQuestRewards(quest);
             _player.MarkQuestCompleted(quest);
 
-            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
             UpdateWeaponListInUI();
@@ -359,7 +345,6 @@ namespace SuperAdventure
             }
             rtbMessages.AppendText(Environment.NewLine);
 
-            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
             UpdateWeaponListInUI();
@@ -403,8 +388,6 @@ namespace SuperAdventure
             rtbMessages.AppendText(_currentMonster.Name + " did " + damageToPlayer.ToString() +
                 " points of damage." + Environment.NewLine + Environment.NewLine);
 
-            UpdatePlayerStatsInUI();
-
             if (_player.CurrentHitPoints <= 0)
             {
                 rtbMessages.AppendText("You were defeated by " + _currentMonster.Name + "!" + Environment.NewLine + Environment.NewLine);
@@ -427,7 +410,6 @@ namespace SuperAdventure
 
             _player.RemovePotion(potion);
 
-            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdatePotionListInUI();
 
