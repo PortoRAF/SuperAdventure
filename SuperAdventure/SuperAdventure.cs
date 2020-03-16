@@ -27,13 +27,13 @@ namespace SuperAdventure
             MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
 
             // Assign labels text values to match player's attributes
-            UpdatePlayerAttributesInUI();
+            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
             DisplayWeaponAndPotionListsInUI(false);
         }
 
-        private void UpdatePlayerAttributesInUI()
+        private void UpdatePlayerStatsInUI()
         {
             lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             lblGold.Text = _player.Gold.ToString();
@@ -209,7 +209,7 @@ namespace SuperAdventure
             _player.AddQuestRewards(quest);
             _player.MarkQuestCompleted(quest);
 
-            UpdatePlayerAttributesInUI();
+            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
             UpdateWeaponListInUI();
@@ -329,7 +329,7 @@ namespace SuperAdventure
             }
             rtbMessages.AppendText(Environment.NewLine);
 
-            UpdatePlayerAttributesInUI();
+            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
             UpdateWeaponListInUI();
@@ -373,7 +373,7 @@ namespace SuperAdventure
             rtbMessages.AppendText(_currentMonster.Name + " did " + damageToPlayer.ToString() +
                 " points of damage." + Environment.NewLine + Environment.NewLine);
 
-            UpdatePlayerAttributesInUI();
+            UpdatePlayerStatsInUI();
 
             if (_player.CurrentHitPoints <= 0)
             {
@@ -397,7 +397,7 @@ namespace SuperAdventure
 
             _player.RemovePotion(potion);
 
-            UpdatePlayerAttributesInUI();
+            UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdatePotionListInUI();
 

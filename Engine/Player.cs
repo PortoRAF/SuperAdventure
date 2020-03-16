@@ -49,21 +49,16 @@ namespace Engine
 
 		public bool HasAllQuestCompletionItems(Quest quest)
 		{
-			bool hasAllQuestItems = true;
 			foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
 			{
-				bool foundItemInInventory = false;
-				foreach (InventoryItem playerItem in Inventory)
+				if (!Inventory.Exists(a => a.Details.ID == questItem.Details.ID 
+					&& a.Quantity >= questItem.Quantity))
 				{
-					if (playerItem.Details.ID == questItem.Details.ID 
-						&& playerItem.Quantity >= questItem.Quantity)
-					{
-						foundItemInInventory = true;
-					}
+					return false;
 				}
-				hasAllQuestItems &= foundItemInInventory;
+					
 			}
-			return hasAllQuestItems;
+			return true;
 		}
 
 		public void RemoveQuestCompletionItems(Quest quest)
