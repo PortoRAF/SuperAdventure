@@ -64,23 +64,19 @@ namespace Engine
 		public void RemoveQuestCompletionItems(Quest quest)
 		{
 			List<int> markItemForDeletion = new List<int>();
-			for (int i = 0; i < quest.QuestCompletionItems.Count; i++)
+			foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)  // (int i = 0; i < quest.QuestCompletionItems.Count; i++)
 			{
-				for (int j = 0; j < Inventory.Count; j++)				
+				InventoryItem item = Inventory.SingleOrDefault(a => a.Details.ID == questItem.Details.ID);
+
+				if (item != null)
 				{
-					if (Inventory[j].Details.ID == quest.QuestCompletionItems[i].Details.ID)
+					item.Quantity -= questItem.Quantity;
+
+					if (item.Quantity == 0)
 					{
-						Inventory[j].Quantity -= quest.QuestCompletionItems[i].Quantity;
-						if (Inventory[j].Quantity == 0)
-						{
-							markItemForDeletion.Add(j);
-						}
+						Inventory.Remove(item);
 					}
 				}
-			}
-			for (int i = markItemForDeletion.Count - 1; i >= 0 ; i--)
-			{
-				Inventory.RemoveAt(markItemForDeletion[i]);
 			}
 		}
 
