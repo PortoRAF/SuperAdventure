@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,21 +17,29 @@ namespace SuperAdventure
         // Create player and monster objects on class scope
         private Player _player;
         private Monster _currentMonster;
+        private const string PLAYER_DATA_FILE_NAME = "PlayerData.xml";
 
         public SuperAdventure()
         {
             InitializeComponent();
 
             // player initial stats, items and location
-            _player = new Player(10, 10, 20, 0, 1);
-            _player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
-            MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
+            if (File.Exists(PLAYER_DATA_FILE_NAME))
+            {
+                _player = Player.CreatePlayerFromXmlString(File.ReadAllText(PLAYER_DATA_FILE_NAME));
+            }
+            else
+            {
+                _player = Player.CreateDefaultPlayer();
+            }
+
+            MoveTo(_player.CurrentLocation);
 
             // Assign labels text values to match player's attributes
             UpdatePlayerStatsInUI();
             UpdateInventoryListInUI();
             UpdateQuestListInUI();
-            DisplayWeaponAndPotionListsInUI(false);
+            DisplayWeaponAndPotionListsInUI(_player.CurrentLocation.MonsterLivingHere!=null); ;
         }
 
         private void UpdatePlayerStatsInUI()
@@ -76,7 +85,7 @@ namespace SuperAdventure
             {
                 foreach (PlayerQuest quest in _player.Quests)
                 {
-                    dgvQuests.Rows.Add(new[] { quest.Details.Name, quest.IsComplete?"Yes":"No" });
+                    dgvQuests.Rows.Add(new[] { quest.Details.Name, quest.isCompleted?"Yes":"No" });
                 }
             }
         }
@@ -402,6 +411,11 @@ namespace SuperAdventure
             UpdatePotionListInUI();
 
             DamageToPlayer();
+        }
+
+        private void SuperAdventure_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXMLString());
         }
     }
 }
