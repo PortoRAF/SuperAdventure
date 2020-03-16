@@ -264,12 +264,23 @@ namespace SuperAdventure
             }
             if (weapons.Count != 0)
             {
+                cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged;
                 cboWeapons.DataSource       = weapons;
+                cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
                 cboWeapons.DisplayMember    = "Name";
                 cboWeapons.ValueMember      = "ID";
-                cboWeapons.SelectedIndex    = 0;
                 cboWeapons.Visible          = true;
                 btnUseWeapon.Visible        = true;
+
+                if (_player.CurrentWeapon != null)
+                {
+                    cboWeapons.SelectedItem = _player.CurrentWeapon;
+                }
+                else
+                {
+                    cboWeapons.SelectedItem = 0;
+                }
+
                 return true;
             }
             else
@@ -426,6 +437,11 @@ namespace SuperAdventure
         private void SuperAdventure_FormClosing(object sender, FormClosingEventArgs e)
         {
             File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXMLString());
+        }
+
+        private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _player.CurrentWeapon = (Weapon)cboWeapons.SelectedItem;
         }
     }
 }
