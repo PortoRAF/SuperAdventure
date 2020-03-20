@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,11 +10,30 @@ namespace Engine
 {
 	public class Player : LivingCreature
 	{
-		public int Gold { get; set; }
-		public int ExperiencePoints { get; set; }
+		private int _gold;
+		private int _experiencePoints;
+		public int Gold
+		{
+			get { return _gold; }
+			set
+			{
+				_gold = value;
+				OnPropertyChanged("Gold");
+			}
+		}
+		public int ExperiencePoints
+		{
+			get { return _experiencePoints; }
+			private set
+			{
+				_experiencePoints = value;
+				OnPropertyChanged("ExperiencePoints");
+				OnPropertyChanged("Level");
+			}
+		}
 		public int Level { get; set; }
-		public List<InventoryItem> Inventory { get; set; }
-		public List<PlayerQuest> Quests { get; set; }
+		public BindingList<InventoryItem> Inventory { get; set; }
+		public BindingList<PlayerQuest> Quests { get; set; }
 		public Location CurrentLocation { get; set; }
 		public Weapon CurrentWeapon { get; set; }
 
@@ -24,8 +44,8 @@ namespace Engine
 			ExperiencePoints = experiencePoints;
 			Level = level;
 
-			Inventory = new List<InventoryItem>();
-			Quests = new List<PlayerQuest>();
+			Inventory = new BindingList<InventoryItem>();
+			Quests = new BindingList<PlayerQuest>();
 		}
 
 		public static Player CreateDefaultPlayer()
@@ -77,7 +97,7 @@ namespace Engine
 					bool isCompleted = Convert.ToBoolean(node.Attributes["IsCompleted"].Value);
 
 					PlayerQuest playerQuest = new PlayerQuest(World.QuestByID(id));
-					playerQuest.isCompleted = isCompleted;
+					playerQuest.IsCompleted = isCompleted;
 
 					player.Quests.Add(playerQuest);					
 				}
@@ -91,6 +111,11 @@ namespace Engine
 			}
 		}
 
+		public void RestoreHitPoints()
+		{
+			CurrentHitPoints = MaximumHitPoints;
+		}
+
 		public bool HasRequiredItemToEnterThisLocation(Location location)
 		{
 			if (location.ItemRequiredToEnter == null)
@@ -99,24 +124,24 @@ namespace Engine
 				return true;
 			}
 
-			return Inventory.Exists(a => a.Details.ID == location.ItemRequiredToEnter.ID);
+			return Inventory.Any(a => a.Details.ID == location.ItemRequiredToEnter.ID);
 		}
 
 		public bool HasThisQuest(Quest quest)
 		{
-			return Quests.Exists(a => a.Details.ID == quest.ID);
+			return Quests.Where(a => a.Details.ID == quest.ID).SingleOrDefault() != null;
 		}
 
 		public bool CompletedThisQuest(Quest quest)
 		{
-			return Quests.Find(a => a.Details.ID == quest.ID).isCompleted;
+			return Quests.SingleOrDefault(a => a.Details.ID == quest.ID).IsCompleted;
 		}
 
 		public bool HasAllQuestCompletionItems(Quest quest)
 		{
 			foreach (QuestCompletionItem questItem in quest.QuestCompletionItems)
 			{
-				if (!Inventory.Exists(a => a.Details.ID == questItem.Details.ID 
+				if (!Inventory.Any(a => a.Details.ID == questItem.Details.ID 
 					&& a.Quantity >= questItem.Quantity))
 				{
 					return false;
@@ -150,9 +175,9 @@ namespace Engine
 			AddExperiencePoints(quest.RewardExperiencePoints);
 			Gold += quest.RewardGold;
 
-			if (Inventory.Exists(x => x.Details.ID == quest.RewardItem.ID))
+			if (Inventory.Any(x => x.Details.ID == quest.RewardItem.ID))
 			{
-				Inventory.Find(x => x.Details.ID == quest.RewardItem.ID).Quantity += 1;
+				Inventory.SingleOrDefault(x => x.Details.ID == quest.RewardItem.ID).Quantity += 1;
 			}
 			else
 			{
@@ -162,7 +187,7 @@ namespace Engine
 
 		public void MarkQuestCompleted(Quest quest)
 		{
-			Quests.Find(a => a.Details.ID == quest.ID).isCompleted = true;
+			Quests.SingleOrDefault(a => a.Details.ID == quest.ID).IsCompleted = true;
 		}
 
 		public void AddMonsterRewards(Monster monster, List<Item> loot)
@@ -171,9 +196,9 @@ namespace Engine
 			Gold += monster.RewardGold;
 
 			foreach (Item rewardItems in loot)
-			if (Inventory.Exists(x => x.Details.ID == rewardItems.ID))
+			if (Inventory.Any(x => x.Details.ID == rewardItems.ID))
 			{
-				Inventory.Find(x => x.Details.ID == rewardItems.ID).Quantity += 1;
+				Inventory.SingleOrDefault(x => x.Details.ID == rewardItems.ID).Quantity += 1;
 			}
 			else
 			{
@@ -326,7 +351,7 @@ namespace Engine
 				playerQuest.Attributes.Append(idAttribute);
 
 				XmlAttribute isCompletedAttibute = playerData.CreateAttribute("IsCompleted");
-				isCompletedAttibute.Value = quest.isCompleted.ToString();
+				isCompletedAttibute.Value = quest.IsCompleted.ToString();
 				playerQuest.Attributes.Append(isCompletedAttibute);
 
 				playerQuests.AppendChild(playerQuest);
