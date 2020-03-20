@@ -114,7 +114,7 @@ namespace Engine
             CurrentHitPoints = MaximumHitPoints;
         }
 
-        public bool HasRequiredItemToEnterThisLocation(Location location)
+        public bool HasRequiredItemToEnter(Location location)
         {
             if (location.ItemRequiredToEnter == null)
             {
