@@ -208,6 +208,49 @@ namespace Engine
 			}
 		}
 
+		public void AddItemToInventory(Item itemToAdd, int quantity = 1)
+		{
+			if (quantity <= 0)
+			{
+				return;
+			}
+
+			InventoryItem item = Inventory.SingleOrDefault(a => a.Details.ID == itemToAdd.ID);
+
+			if (item == null)
+			{
+				Inventory.Add(new InventoryItem(itemToAdd, quantity));
+			}
+			else
+			{
+				item.Quantity += quantity;
+			}
+		}
+
+		public void RemoveItemFromInventory(Item itemToRemove, int quantity = 1)
+		{
+			if (quantity <= 0)
+			{
+				return;
+			}
+
+			InventoryItem item = Inventory.SingleOrDefault(a => a.Details.ID == itemToRemove.ID);
+
+			if (item == null)
+			{
+				return;
+			}
+			else
+			{
+				item.Quantity -= quantity;
+
+				if (item.Quantity <= 0)
+				{
+					Inventory.Remove(item);
+				}
+			}
+		}
+
 		public string ToXMLString()
 		{
 			XmlDocument playerData = new XmlDocument();
