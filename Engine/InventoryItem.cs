@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Engine
 {
@@ -12,8 +7,8 @@ namespace Engine
         public event PropertyChangedEventHandler PropertyChanged;
 
         private Item _details;
-        private int _quantity;        
-        public Item Details 
+        private int _quantity;
+        public Item Details
         {
             get { return _details; }
             set
@@ -21,7 +16,7 @@ namespace Engine
                 _details = value;
                 OnPropertyChanged("Details");
             }
-        }        
+        }
         public int Quantity
         {
             get { return _quantity; }
@@ -31,7 +26,7 @@ namespace Engine
                 OnPropertyChanged("Quantity");
                 OnPropertyChanged("Description");
             }
-        }        
+        }
         public int ItemID
         {
             get { return Details.ID; }

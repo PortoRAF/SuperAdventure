@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Engine
 {
@@ -30,9 +26,9 @@ namespace Engine
             InventoryItem item = Inventory.SingleOrDefault(a => a.Details.ID == itemToAdd.ID);
 
             if (item == null)
-            {                
+            {
                 Inventory.Add(new InventoryItem(itemToAdd, quantity));
-            } 
+            }
             else
             {
                 item.Quantity += quantity;
@@ -49,7 +45,7 @@ namespace Engine
             }
 
             InventoryItem item = Inventory.SingleOrDefault(a => a.Details.ID == itemToRemove.ID);
-            
+
             if (item == null)
             {
                 return;

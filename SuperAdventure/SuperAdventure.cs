@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Engine;
 
@@ -60,9 +54,9 @@ namespace SuperAdventure
             MoveTo(_player.CurrentLocation);
 
             UpdateQuestListInUI();
-            DisplayWeaponAndPotionListsInUI(_player.CurrentLocation.MonsterLivingHere!=null); ;
+            DisplayWeaponAndPotionListsInUI(_player.CurrentLocation.MonsterLivingHere != null); ;
         }
-               
+
         private void UpdateQuestListInUI()
         {
             dgvQuests.RowHeadersVisible = false;
@@ -107,7 +101,7 @@ namespace SuperAdventure
         private void btnTrade_Click(object sender, EventArgs e)
         {
             TradingScreen tradingScreen = new TradingScreen(_player);
-            tradingScreen.StartPosition = FormStartPosition.CenterParent;            
+            tradingScreen.StartPosition = FormStartPosition.CenterParent;
             tradingScreen.ShowDialog(this);
         }
 
@@ -124,7 +118,7 @@ namespace SuperAdventure
 
             UpdateLocation(newLocation);
             _player.RestoreHitPoints();
-            
+
             btnTrade.Visible = newLocation.VendorWorkingHere != null;
 
             if (newLocation.QuestAvailableHere != null)
@@ -138,8 +132,8 @@ namespace SuperAdventure
                 Monster sampleMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
 
                 // create new monster from loaded stats
-                _currentMonster = new Monster(sampleMonster.ID, sampleMonster.Name, sampleMonster.MaximumDamage, 
-                    sampleMonster.RewardExperiencePoints, sampleMonster.RewardGold, sampleMonster.CurrentHitPoints, 
+                _currentMonster = new Monster(sampleMonster.ID, sampleMonster.Name, sampleMonster.MaximumDamage,
+                    sampleMonster.RewardExperiencePoints, sampleMonster.RewardGold, sampleMonster.CurrentHitPoints,
                     sampleMonster.MaximumHitPoints);
                 foreach (LootItem lootItem in sampleMonster.LootTable)
                 {
@@ -151,7 +145,7 @@ namespace SuperAdventure
 
                 DisplayWeaponAndPotionListsInUI(true);
             }
-            else 
+            else
             {
                 DisplayWeaponAndPotionListsInUI(false);
             }
@@ -200,8 +194,8 @@ namespace SuperAdventure
             else
             {
                 if (!_player.CompletedThisQuest(quest)
-                    && _player.HasAllQuestCompletionItems(quest)) 
-                {                    
+                    && _player.HasAllQuestCompletionItems(quest))
+                {
                     CompleteQuest(quest);
                 }
             }
@@ -229,10 +223,10 @@ namespace SuperAdventure
             if (!isVisible)
             {
                 lblSelectAction.Visible = false;
-                cboWeapons.Visible      = false;
-                cboPotions.Visible      = false;
-                btnUseWeapon.Visible    = false;
-                btnUsePotion.Visible    = false;
+                cboWeapons.Visible = false;
+                cboPotions.Visible = false;
+                btnUseWeapon.Visible = false;
+                btnUsePotion.Visible = false;
             }
             else
             {
@@ -254,12 +248,12 @@ namespace SuperAdventure
             if (weapons.Count != 0)
             {
                 cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged;
-                cboWeapons.DataSource       = weapons;
+                cboWeapons.DataSource = weapons;
                 cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
-                cboWeapons.DisplayMember    = "Name";
-                cboWeapons.ValueMember      = "ID";
-                cboWeapons.Visible          = true;
-                btnUseWeapon.Visible        = true;
+                cboWeapons.DisplayMember = "Name";
+                cboWeapons.ValueMember = "ID";
+                cboWeapons.Visible = true;
+                btnUseWeapon.Visible = true;
 
                 if (_player.CurrentWeapon != null)
                 {
@@ -274,8 +268,8 @@ namespace SuperAdventure
             }
             else
             {
-                cboWeapons.Visible      = false;
-                btnUseWeapon.Visible    = false;
+                cboWeapons.Visible = false;
+                btnUseWeapon.Visible = false;
                 return false;
             }
         }
@@ -292,18 +286,18 @@ namespace SuperAdventure
             }
             if (healingPotions.Count != 0)
             {
-                cboPotions.DataSource       = healingPotions;
-                cboPotions.DisplayMember    = "Name";
-                cboPotions.ValueMember      = "ID";
-                cboPotions.SelectedIndex    = 0;
-                cboPotions.Visible          = true;
-                btnUsePotion.Visible        = true;
+                cboPotions.DataSource = healingPotions;
+                cboPotions.DisplayMember = "Name";
+                cboPotions.ValueMember = "ID";
+                cboPotions.SelectedIndex = 0;
+                cboPotions.Visible = true;
+                btnUsePotion.Visible = true;
                 return true;
             }
             else
             {
-                cboPotions.Visible      = false;
-                btnUsePotion.Visible    = false;
+                cboPotions.Visible = false;
+                btnUsePotion.Visible = false;
                 return false;
             }
         }
@@ -336,7 +330,7 @@ namespace SuperAdventure
         {
             List<Item> lootedItems = GetMonsterLoot();
             _player.AddMonsterRewards(_currentMonster, lootedItems);
-            
+
             rtbMessages.AppendText("You killed " + _currentMonster.Name + "!" + Environment.NewLine + Environment.NewLine);
             rtbMessages.AppendText("You loot: " + Environment.NewLine);
             rtbMessages.AppendText(_currentMonster.RewardExperiencePoints + " experience points" + Environment.NewLine);
@@ -401,7 +395,7 @@ namespace SuperAdventure
         private void btnUsePotion_Click(object sender, EventArgs e)
         {
             rtbMessages.AppendText("You use 1 healing potion." + Environment.NewLine + Environment.NewLine);
-            HealingPotion potion = (HealingPotion) cboPotions.SelectedItem;
+            HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
 
             _player.CurrentHitPoints += potion.AmountToHeal;
             if (_player.CurrentHitPoints > _player.MaximumHitPoints)
