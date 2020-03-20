@@ -27,15 +27,15 @@ namespace Engine
                 return;
             }
 
-            InventoryItem ii = Inventory.SingleOrDefault(a => a.Details.ID == itemToAdd.ID);
+            InventoryItem item = Inventory.SingleOrDefault(a => a.Details.ID == itemToAdd.ID);
 
-            if (ii == null)
+            if (item == null)
             {                
                 Inventory.Add(new InventoryItem(itemToAdd, quantity));
             } 
             else
             {
-                ii.Quantity += quantity;
+                item.Quantity += quantity;
             }
 
             OnPropertyChanged("Inventory");
@@ -48,19 +48,19 @@ namespace Engine
                 return;
             }
 
-            InventoryItem ii = Inventory.SingleOrDefault(a => a.Details.ID == itemToRemove.ID);
+            InventoryItem item = Inventory.SingleOrDefault(a => a.Details.ID == itemToRemove.ID);
             
-            if (ii == null)
+            if (item == null)
             {
                 return;
             }
             else
             {
-                ii.Quantity -= quantity;
+                item.Quantity -= quantity;
 
-                if (ii.Quantity <= 0)
+                if (item.Quantity <= 0)
                 {
-                    Inventory.Remove(ii);
+                    Inventory.Remove(item);
                 }
             }
 
