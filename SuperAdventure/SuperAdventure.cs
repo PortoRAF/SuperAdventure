@@ -66,21 +66,22 @@ namespace SuperAdventure
         private void UpdateQuestListInUI()
         {
             dgvQuests.RowHeadersVisible = false;
+            dgvQuests.AutoGenerateColumns = false;
 
-            dgvQuests.ColumnCount = 2;
-            dgvQuests.Columns[0].Name = "Quest";
-            dgvQuests.Columns[0].Width = 197;
-            dgvQuests.Columns[1].Name = "Done?";
+            dgvQuests.DataSource = _player.Quests;
 
-            dgvQuests.Rows.Clear();
-
-            if (_player.Quests.Count != 0)
+            dgvQuests.Columns.Add(new DataGridViewTextBoxColumn
             {
-                foreach (PlayerQuest quest in _player.Quests)
-                {
-                    dgvQuests.Rows.Add(new[] { quest.Details.Name, quest.isCompleted?"Yes":"No" });
-                }
-            }
+                HeaderText = "Name",
+                Width = 197,
+                DataPropertyName = "Name"
+            });
+
+            dgvQuests.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Done?",
+                DataPropertyName = "IsCompleted"
+            });
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
@@ -196,7 +197,6 @@ namespace SuperAdventure
                     CompleteQuest(quest);
                 }
             }
-            UpdateQuestListInUI();
         }
 
         private void CompleteQuest(Quest quest)
@@ -212,7 +212,6 @@ namespace SuperAdventure
             _player.AddQuestRewards(quest);
             _player.MarkQuestCompleted(quest);
 
-            UpdateQuestListInUI();
             UpdateWeaponListInUI();
             UpdatePotionListInUI();
         }
@@ -341,7 +340,6 @@ namespace SuperAdventure
             }
             rtbMessages.AppendText(Environment.NewLine);
 
-            UpdateQuestListInUI();
             UpdateWeaponListInUI();
             UpdatePotionListInUI();
 
