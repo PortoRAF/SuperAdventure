@@ -110,6 +110,13 @@ namespace SuperAdventure
             MoveTo(_player.CurrentLocation.LocationToWest);
         }
 
+        private void btnTrade_Click(object sender, EventArgs e)
+        {
+            TradingScreen tradingScreen = new TradingScreen(_player);
+            tradingScreen.StartPosition = FormStartPosition.CenterParent;            
+            tradingScreen.ShowDialog(this);
+        }
+
         private void MoveTo(Location newLocation)
         {
             if (!_player.HasRequiredItemToEnterThisLocation(newLocation))
@@ -122,8 +129,8 @@ namespace SuperAdventure
             }
 
             UpdateLocation(newLocation);
-
             RestoreHitPoints();
+            btnTrade.Visible = newLocation.VendorWorkingHere != null;
 
             if (newLocation.QuestAvailableHere != null)
             {
