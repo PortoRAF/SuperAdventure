@@ -98,6 +98,14 @@ namespace SuperAdventure
 
             dgvVendorItems.Columns.Add(new DataGridViewTextBoxColumn
             {
+                HeaderText = "Qty",
+                Width = 30,
+                DefaultCellStyle = rightAlignedCellStyle,
+                DataPropertyName = "Quantity"
+            });
+
+            dgvVendorItems.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 HeaderText = "Price",
                 Width = 35,
                 DefaultCellStyle = rightAlignedCellStyle,
@@ -119,7 +127,7 @@ namespace SuperAdventure
 
         private void dgvMyItems_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 4)
+            if (e.ColumnIndex == 4 && e.RowIndex >= 0)
             {
                 var itemID = dgvMyItems.Rows[e.RowIndex].Cells[0].Value;
 
@@ -141,7 +149,7 @@ namespace SuperAdventure
 
         private void dgvVendorItems_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 3)
+            if (e.ColumnIndex == 4 && e.RowIndex >= 0)
             {
                 var itemID = dgvVendorItems.Rows[e.RowIndex].Cells[0].Value;
 
