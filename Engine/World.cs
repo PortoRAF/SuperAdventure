@@ -104,10 +104,16 @@ namespace Engine
 
 		private static void PopulateLocations()
 		{
+			// Create a vendor
+			Vendor bobTheRatCatcher = new Vendor("Bob the Rat-Catcher");
+			bobTheRatCatcher.AddItemToInventory(ItemByID(ITEM_ID_PIECE_OF_FUR), 5);
+			bobTheRatCatcher.AddItemToInventory(ItemByID(ITEM_ID_RAT_TAIL), 3);
+
 			// Create each location
 			Location home = new Location(LOCATION_ID_HOME, "Home", "Your house. You really need to clean up the place.");
 
 			Location townSquare = new Location(LOCATION_ID_TOWN_SQUARE, "Town square", "You see a fountain.");
+			townSquare.VendorWorkingHere = bobTheRatCatcher;
 
 			Location alchemistHut = new Location(LOCATION_ID_ALCHEMIST_HUT, "Alchemist's hut", "There are many strange plants on the shelves.");
 			alchemistHut.QuestAvailableHere = QuestByID(QUEST_ID_CLEAR_ALCHEMIST_GARDEN);
